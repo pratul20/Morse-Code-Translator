@@ -1,12 +1,16 @@
 package com.pratul20.morsecodetranslator;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -17,6 +21,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
 
     HashMap <Character,String> charMap;
+    ConstraintLayout MainLayout;
     EditText normalText;
     EditText morseText;
 
@@ -87,8 +92,23 @@ public class MainActivity extends AppCompatActivity {
         charMap.put(' ',"/");
     }
 
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        if(inputMethodManager.isAcceptingText()){
+            inputMethodManager.hideSoftInputFromWindow(
+                    activity.getCurrentFocus().getWindowToken(),
+                    0
+            );
+        }
+    }
+
     public void convertMorse(View view) {
         String normal = normalText.getText().toString();
+        if(normal.length()==0) {
+            return;
+        }
         normal = normal.toUpperCase();
         String morse = "";
         for(int i=0;i<normal.length();i++) {
@@ -103,10 +123,16 @@ public class MainActivity extends AppCompatActivity {
         }
         morseText.setText(morse);
 
+        hideSoftKeyboard(this);
+
+
     }
 
     public void convertNormal(View view) {
         String morse = morseText.getText().toString();
+        if(morse.length()==0) {
+            return;
+        }
         String normal = "";
         String[] codes = morse.split(" ");
         for (String code : codes) {
@@ -118,6 +144,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         normalText.setText(normal);
+
+        hideSoftKeyboard(this);
+
     }
 
     public void deleteNormal(View view) {
@@ -150,6 +179,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         normalText = findViewById(R.id.normalText);
         morseText = findViewById(R.id.morseText);
+        MainLayout = findViewById(R.id.MainLayout);
         charMap = new HashMap<Character, String>();
         mapToChar();
     }
